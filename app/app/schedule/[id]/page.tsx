@@ -13,7 +13,6 @@ import {
   vestingProgress,
   formatDate,
   formatCliffDate,
-  claimVested,
   revokeSchedule,
   parseContractError,
   NETWORK,
@@ -44,33 +43,6 @@ export default function ScheduleDetailPage() {
   useEffect(() => { load(); }, [id]);
 
   const now = Math.floor(Date.now() / 1000);
-
-  const handleClaim = async () => {
-    if (!publicKey || !schedule) return;
-    setActionLoading("claim"); setErr(""); setLastTxHash(null);
-    const toastId = addToast({
-      status: "pending",
-      title: "Claim pending…",
-      message: "Waiting for transaction to confirm.",
-    });
-    try {
-      const hash = await claimVested(publicKey, schedule.id);
-      setLastTxHash(hash);
-      updateToast(toastId, {
-        status: "success",
-        title: "Tokens claimed!",
-        message: `${stroopsToXlm(claimableAmt)} XLM transferred to your wallet.`,
-        txHash: hash,
-        network: NETWORK,
-      });
-      await load();
-    }
-    catch (e: any) {
-      setErr(parseContractError(e));
-      updateToast(toastId, { status: "error", title: "Claim failed", message: parseContractError(e) });
-    }
-    finally { setActionLoading(null); }
-  };
 
   const handleRevoke = async () => {
     if (!publicKey || !schedule) return;
